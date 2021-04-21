@@ -50,7 +50,7 @@ export function PlantSelect(){
         const {data} = await api.get(`plants?_sort=name&_order=asc&_page=${page}&_limit=8`);
 
         if(!data)
-            return setLoading(true);
+            return setLoadingMore(true);
 
         if(page > 1){
             setPlants(oldValue => [...oldValue, ...data])
@@ -82,6 +82,7 @@ export function PlantSelect(){
 
         setLoadingMore(true);
         setPage(oldValue => oldValue+1);
+        fetchPlants();
     }
 
     useEffect(()=>{
