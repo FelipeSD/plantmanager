@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
-    StyleSheet, View, Text, Image
+    StyleSheet, View, Text, Image, Alert
 } from 'react-native';
 import { Header } from '../components/Header';
 
@@ -8,16 +8,41 @@ import colors from '../styles/colors';
 import fonts from '../styles/fonts';
 import waterDrop from '../assets/waterdrop.png';
 
-import { loadPlant, PlantProps } from '../libs/storage';
+import { loadPlant, PlantProps, removePlant } from '../libs/storage';
 import { formatDistance } from 'date-fns';
 import { pt } from 'date-fns/locale';
-import { FlatList } from 'react-native-gesture-handler';
+import { FlatList, ScrollView } from 'react-native-gesture-handler';
 import { PlantCardSecondary } from '../components/PlantCardSecondary';
+import { Load } from '../components/Load';
 
 export function MyPlants(){
     const [myPlants, setMyPlants] = useState<PlantProps[]>([]);
     const [loading, setLoading] = useState(true);
     const [nextWatered, setNextWatered] = useState<string>();
+
+    const handleRemove = (plant: PlantProps) => {
+        Alert.alert('Remover', `Deseja remover a ${plant.name}?`, [
+            {
+                text: 'Não',
+                style: 'cancel'
+            },
+            {
+                text: 'Sim',
+                onPress: async() => {
+                    try {
+                        await removePlant(plant.id);
+
+                        setMyPlants((oldData) => {
+                            return oldData.filter((item) => item.id != plant.id)
+                        });
+                    }catch (e) {
+                        Alert.alert("Não foi possível remover!");
+                    }
+                }
+            }
+        ]);
+    }
+
     useEffect(() =>{
         async function loadStorageData(){
             const plantsStoraged = await loadPlant();
@@ -39,37 +64,41 @@ export function MyPlants(){
         loadStorageData();
     }, []);
 
+    if (loading)
+        return <Load />
+
     return (
-        <View style={styles.container}>
-            <Header />
+        <ScrollView
+            showsVerticalScrollIndicator={false}
+        >
+            <View style={styles.container}>
+                <Header />
 
-            <View style={styles.spotlight}>
-                <Image source={waterDrop}
-                    // style={styles.spotlightImage}
-                />
-                <Text style={styles.spotlightText}>
-                    {nextWatered}
-                </Text>
+                <View style={styles.spotlight}>
+                    <Image source={waterDrop} />
+                    <Text style={styles.spotlightText}>
+                        {nextWatered}
+                    </Text>
+                </View>
+
+                <View style={styles.plants}>
+                    <Text style={styles.plantsTitle}>
+                        Próximas regadas
+                    </Text>
+
+                    { 
+                        myPlants.map((item) => {
+                            return <PlantCardSecondary
+                                key={item.id}
+                                handleRemove={()=>(handleRemove(item))}
+                                data={item}
+                            />
+                        })
+                    }
+
+                </View>
             </View>
-
-            <View style={styles.plants}>
-                <Text style={styles.plantsTitle}>
-                    Próximas regadas
-                </Text>
-
-                <FlatList
-                    data={myPlants}
-                    keyExtractor={(item) => String(item.id)}
-                    showsVerticalScrollIndicator={false}
-                    contentContainerStyle={{flex: 1}}
-                    renderItem={({item})=>(
-                        <PlantCardSecondary 
-                            data={item}
-                        />
-                    )}
-                />
-            </View>
-        </View>
+        </ScrollView>
     );
 }
 
@@ -103,7 +132,6 @@ const styles = StyleSheet.create({
     plants: {
         flex: 1,
         width: "100%",
-
     },
     plantsTitle: {
         fontSize: 24,

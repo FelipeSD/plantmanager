@@ -4,6 +4,7 @@ import { PlantSelect } from '../pages/PlantSelect';
 import { MyPlants } from '../pages/MyPlants';
 import { MaterialIcons } from '@expo/vector-icons';
 import colors from '../styles/colors';
+import { Platform } from 'react-native';
 
 const AppTab = createBottomTabNavigator();
 
@@ -15,7 +16,7 @@ const AuthRoutes = () => {
                 inactiveTintColor: colors.heading,
                 labelPosition: 'beside-icon',
                 style: {
-                    paddingHorizontal: 20,
+                    paddingHorizontal:Platform.OS === 'ios' ? 20 : 0,
                     height: 88
                 }
             }}

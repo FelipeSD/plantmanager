@@ -4,7 +4,8 @@ import {
     Text,
     StyleSheet,
     FlatList,
-    ActivityIndicator
+    ActivityIndicator,
+    Dimensions
 } from 'react-native';
 import { EnvironmentButton } from '../components/EnvironmentButton';
 
@@ -129,8 +130,7 @@ export function PlantSelect(){
                     horizontal
                     showsHorizontalScrollIndicator={false}
                     contentContainerStyle={styles.environmentList}
-                >
-                </FlatList>
+                />
             </View>
 
             <View style={styles.plants}>
@@ -154,9 +154,7 @@ export function PlantSelect(){
                             ? <ActivityIndicator color={colors.green_dark} />
                             : <></>
                     }
-                >
-
-                </FlatList>
+                />
             </View>
 
         </View>
@@ -189,8 +187,8 @@ const styles = StyleSheet.create({
         height: 40,
         justifyContent: 'center',
         paddingBottom: 5,
-        marginLeft: 32,
-        marginVertical: 32
+        paddingHorizontal: 32,
+        marginVertical: 20
     },
     plants: {
         flex: 1,
